@@ -203,10 +203,10 @@
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:nuvibe/services/song_handler.dart';
-import 'package:nuvibe/ui/components/play_pause_button.dart';
-import 'package:nuvibe/ui/components/song_progress.dart';
-import 'package:nuvibe/ui/screens/player_screen.dart';
+import 'package:nuvibe/core/services/song_handler.dart';
+import 'package:nuvibe/presentation/global%20widgets/play_pause_button.dart';
+import 'package:nuvibe/presentation/global%20widgets/song_progress.dart';
+import 'package:nuvibe/presentation/player_screen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class PlayerDeck extends StatelessWidget {

@@ -116,8 +116,8 @@
 
 import 'dart:io';
 
-import 'package:nuvibe/services/uri_to_file.dart';
-import 'package:nuvibe/utils/formatted_text.dart';
+import 'package:nuvibe/core/services/uri_to_file.dart';
+import 'package:nuvibe/core/utils/formatted_text.dart';
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 

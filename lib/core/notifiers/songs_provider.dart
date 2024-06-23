@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:nuvibe/services/get_songs.dart';
-import 'package:nuvibe/services/song_handler.dart';
+import 'package:nuvibe/core/services/get_songs.dart';
+import 'package:nuvibe/core/services/song_handler.dart';
 import 'package:flutter/material.dart';
 
 // Define a class for managing songs using ChangeNotifier

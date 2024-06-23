@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:nuvibe/services/request_song_permission.dart';
-import 'package:nuvibe/services/song_to_media_item.dart';
+import 'package:nuvibe/core/services/request_song_permission.dart';
+import 'package:nuvibe/core/services/song_to_media_item.dart';
 import 'package:flutter/material.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 

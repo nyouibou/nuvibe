@@ -1,25 +1,38 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:audio_service/audio_service.dart';
-import 'package:nuvibe/notifiers/songs_provider.dart';
-import 'package:nuvibe/services/song_handler.dart';
-import 'package:nuvibe/ui/components/player_deck.dart';
-import 'package:nuvibe/ui/components/song_item.dart';
-import 'package:nuvibe/utils/formatted_title.dart';
+import 'package:nuvibe/core/notifiers/songs_provider.dart';
+import 'package:nuvibe/core/services/song_handler.dart';
+import 'package:nuvibe/presentation/global%20widgets/player_deck.dart';
+import 'package:nuvibe/presentation/global%20widgets/song_item.dart';
+import 'package:nuvibe/presentation/player_screen.dart';
+import 'package:nuvibe/core/utils/formatted_title.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class SearchScreen extends StatefulWidget {
   final SongHandler songHandler;
-  const SearchScreen({super.key, required this.songHandler});
+  const SearchScreen({Key? key, required this.songHandler}) : super(key: key);
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final AutoScrollController _autoScrollController = AutoScrollController();
   // The result list to store filtered songs
   final List<MediaItem> _result = [];
   // Controller for the search input field
   final TextEditingController _textEditingController = TextEditingController();
+
+  void _scrollTo(int index) {
+    _autoScrollController.scrollToIndex(
+      index,
+      preferPosition: AutoScrollPosition.middle,
+      duration: const Duration(milliseconds: 800),
+    );
+  }
 
   // Function to search for songs based on the input value
   void _search({required String value, required List<MediaItem> songs}) {
@@ -29,10 +42,11 @@ class _SearchScreenState extends State<SearchScreen> {
           .toLowerCase()
           .replaceAll(" ", "")
           .contains(value.toLowerCase().replaceAll(" ", ""));
-      bool containsArtist = song.artist!
-          .toLowerCase()
-          .replaceAll(" ", "")
-          .contains(value.toLowerCase().replaceAll(" ", ""));
+      bool containsArtist = song.artist
+              ?.toLowerCase()
+              .replaceAll(" ", "")
+              .contains(value.toLowerCase().replaceAll(" ", "")) ??
+          false;
 
       // If the song matches the search criteria and is not already in the result list, add it
       if (containsTitle || containsArtist) {
@@ -52,17 +66,24 @@ class _SearchScreenState extends State<SearchScreen> {
       builder: (context, ref, child) {
         List<MediaItem> songs = ref.songs;
         return Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: Color.fromARGB(255, 84, 84, 84),
           appBar: AppBar(
+            leading: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                )),
             backgroundColor: Colors.black,
             title: TextField(
               controller: _textEditingController,
               autofocus: true,
               decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Search",
-                  hintStyle: TextStyle(color: Colors.white54),
-                  fillColor: Colors.white),
+                border: InputBorder.none,
+                hintText: "Search",
+                hintStyle: TextStyle(color: Colors.white54),
+              ),
+              style: TextStyle(color: Colors.white),
               onChanged: (value) {
                 // Clear the result list and perform a new search when the input changes
                 setState(() {
@@ -118,7 +139,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildLoadingIndicator() {
     return const Center(
       child: CircularProgressIndicator(
-        strokeCap: StrokeCap.round,
+        strokeWidth: 2.0,
+        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
       ),
     );
   }
@@ -145,7 +167,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         (_result.isNotEmpty
                             ? _result.length - 1
                             : songs.length - 1)
-                    ? _buildLastSongItem(song, playingSong, songs.indexOf(song))
+                    ? _buildLastSongItem(song, playingSong, songIndex)
                     : _buildRegularSongItem(song, playingSong, songIndex);
               },
             );
@@ -168,13 +190,15 @@ class _SearchScreenState extends State<SearchScreen> {
 
   // Function to build the last song item in the list
   Widget _buildLastSongItem(MediaItem song, MediaItem? playingSong, int index) {
+    int id = int.tryParse(song.displayDescription ?? "") ?? 0;
+
     return Column(
       children: [
         // Display the song item
         SongItem(
           art: song.artUri!,
           searchedWord: _textEditingController.text.trim(),
-          id: int.parse(song.displayDescription!),
+          id: id,
           isPlaying: song == playingSong,
           title: formattedTitle(song.title),
           artist: song.artist,
@@ -188,23 +212,37 @@ class _SearchScreenState extends State<SearchScreen> {
         // Display the player deck for the last song
         PlayerDeck(
           songHandler: widget.songHandler,
-          isLast: true,
-          onTap: () {},
+          isLast: false,
+          onTap: (index) {
+            _scrollTo(index);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    FullScreenPlayer(songHandler: widget.songHandler),
+              ),
+            );
+          },
         ),
       ],
     );
   }
 
   // Function to build a regular song item in the list
+  // Update _buildRegularSongItem method
   Widget _buildRegularSongItem(
       MediaItem song, MediaItem? playingSong, int songIndex) {
+    int id = int.tryParse(song.displayDescription ?? "") ?? 0;
+
     return SongItem(
-      art: song.artUri!,
+      art: song.artUri, // Use a default value or handle null appropriately
       searchedWord: _textEditingController.text.trim(),
-      id: int.parse(song.displayDescription!),
+      id: id,
       isPlaying: song == playingSong,
-      title: formattedTitle(song.title),
-      artist: song.artist,
+      title: formattedTitle(
+          song.title), // Use a default value or handle null appropriately
+      artist:
+          song.artist ?? '', // Use a default value or handle null appropriately
       onSongTap: () async {
         // Skip to the selected song when tapped
         await widget.songHandler.skipToQueueItem(songIndex);

@@ -1,13 +1,13 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:nuvibe/notifiers/songs_provider.dart';
-import 'package:nuvibe/services/song_handler.dart';
+import 'package:nuvibe/core/notifiers/songs_provider.dart';
+import 'package:nuvibe/core/services/song_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:get/get.dart';
 
-import 'ui/screens/home_screen.dart';
+import 'presentation/home_screen.dart';
 
 // Create a singleton instance of SongHandler
 SongHandler _songHandler = SongHandler();

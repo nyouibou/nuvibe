@@ -107,10 +107,10 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-import 'package:nuvibe/services/song_handler.dart';
-import 'package:nuvibe/ui/components/player_deck.dart';
-import 'package:nuvibe/ui/components/song_item.dart';
-import 'package:nuvibe/utils/formatted_title.dart';
+import 'package:nuvibe/core/services/song_handler.dart';
+import 'package:nuvibe/presentation/global%20widgets/player_deck.dart';
+import 'package:nuvibe/presentation/global%20widgets/song_item.dart';
+import 'package:nuvibe/core/utils/formatted_title.dart';
 
 // SongsList class to display a list of songs
 class SongsList extends StatelessWidget {

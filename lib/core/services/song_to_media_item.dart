@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:nuvibe/services/get_song_art.dart';
-import 'package:nuvibe/utils/formatted_title.dart';
+import 'package:nuvibe/core/services/get_song_art.dart';
+import 'package:nuvibe/core/utils/formatted_title.dart';
 import 'package:flutter/material.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
