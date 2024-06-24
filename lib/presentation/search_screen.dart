@@ -66,7 +66,7 @@ class _SearchScreenState extends State<SearchScreen> {
       builder: (context, ref, child) {
         List<MediaItem> songs = ref.songs;
         return Scaffold(
-          backgroundColor: Color.fromARGB(255, 84, 84, 84),
+          backgroundColor: Colors.black,
           appBar: AppBar(
             leading: IconButton(
                 onPressed: () => Navigator.of(context).pop(),
