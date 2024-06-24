@@ -3,11 +3,10 @@ import 'package:nuvibe/core/notifiers/songs_provider.dart';
 import 'package:nuvibe/core/services/song_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nuvibe/presentation/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:get/get.dart';
-
-import 'presentation/home_screen.dart';
 
 // Create a singleton instance of SongHandler
 SongHandler _songHandler = SongHandler();
@@ -54,7 +53,7 @@ class MainApp extends StatelessWidget {
             colorScheme: dark,
             useMaterial3: true,
           ),
-          home: HomeScreen(songHandler: _songHandler),
+          home: SplashScreen(songHandler: _songHandler),
         );
       },
     );
