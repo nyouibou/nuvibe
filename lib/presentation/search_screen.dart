@@ -1,15 +1,13 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: unnecessary_null_comparison
 
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/material.dart';
 import 'package:nuvibe/core/notifiers/songs_provider.dart';
 import 'package:nuvibe/core/services/song_handler.dart';
+import 'package:nuvibe/core/utils/formatted_title.dart';
 import 'package:nuvibe/presentation/global%20widgets/player_deck.dart';
 import 'package:nuvibe/presentation/global%20widgets/song_item.dart';
-import 'package:nuvibe/presentation/player_screen.dart';
-import 'package:nuvibe/core/utils/formatted_title.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:scroll_to_index/scroll_to_index.dart';
 
 class SearchScreen extends StatefulWidget {
   final SongHandler songHandler;
@@ -20,35 +18,34 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final AutoScrollController _autoScrollController = AutoScrollController();
-  // The result list to store filtered songs
   final List<MediaItem> _result = [];
-  // Controller for the search input field
   final TextEditingController _textEditingController = TextEditingController();
+  bool _isSearching = false;
 
-  void _scrollTo(int index) {
-    _autoScrollController.scrollToIndex(
-      index,
-      preferPosition: AutoScrollPosition.middle,
-      duration: const Duration(milliseconds: 800),
-    );
-  }
-
-  // Function to search for songs based on the input value
   void _search({required String value, required List<MediaItem> songs}) {
+    _result.clear();
+    if (value.trim().isEmpty) {
+      setState(() {
+        _isSearching = false;
+      });
+      return;
+    }
+
     for (var song in songs) {
-      // Check if the title or artist of the song contains the search value
-      bool containsTitle = song.title
+      if (song.artist == null || song.title == null) {
+        // Skip songs without artist or title information
+        continue;
+      }
+
+      bool containsTitle = song.title!
           .toLowerCase()
           .replaceAll(" ", "")
           .contains(value.toLowerCase().replaceAll(" ", ""));
-      bool containsArtist = song.artist
-              ?.toLowerCase()
-              .replaceAll(" ", "")
-              .contains(value.toLowerCase().replaceAll(" ", "")) ??
-          false;
+      bool containsArtist = song.artist!
+          .toLowerCase()
+          .replaceAll(" ", "")
+          .contains(value.toLowerCase().replaceAll(" ", ""));
 
-      // If the song matches the search criteria and is not already in the result list, add it
       if (containsTitle || containsArtist) {
         bool contains = _result.any((element) => element.id == song.id);
         if (!contains) {
@@ -58,6 +55,10 @@ class _SearchScreenState extends State<SearchScreen> {
         }
       }
     }
+
+    setState(() {
+      _isSearching = false;
+    });
   }
 
   @override
@@ -66,47 +67,46 @@ class _SearchScreenState extends State<SearchScreen> {
       builder: (context, ref, child) {
         List<MediaItem> songs = ref.songs;
         return Scaffold(
-          backgroundColor: Colors.black,
           appBar: AppBar(
-            leading: IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
-                )),
-            backgroundColor: Colors.black,
             title: TextField(
               controller: _textEditingController,
               autofocus: true,
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: "Search",
-                hintStyle: TextStyle(color: Colors.white54),
               ),
-              style: TextStyle(color: Colors.white),
               onChanged: (value) {
-                // Clear the result list and perform a new search when the input changes
+                if (value.trim().isEmpty) {
+                  setState(() {
+                    _result.clear();
+                    _isSearching = false;
+                  });
+                  return;
+                }
+
                 setState(() {
-                  _result.clear();
+                  _isSearching = true;
                 });
-                _search(value: value, songs: songs);
+
+                // Debounce search input
+                Future.delayed(const Duration(milliseconds: 300), () {
+                  if (value == _textEditingController.text.trim()) {
+                    _search(value: value, songs: songs);
+                  }
+                });
               },
             ),
             actions: [
-              // Display a close button if the search input is not empty
               if (_textEditingController.text.trim().isNotEmpty)
                 IconButton(
                   onPressed: () {
-                    // Clear the search input and result list
                     setState(() {
                       _textEditingController.clear();
                       _result.clear();
+                      _isSearching = false;
                     });
                   },
-                  icon: const Icon(
-                    Icons.close,
-                    color: Colors.white,
-                  ),
+                  icon: const Icon(Icons.close),
                 ),
             ],
           ),
@@ -116,64 +116,66 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // Function to build the body of the screen based on the state of the SongsProvider
   Widget _buildBody(SongsProvider ref) {
     if (ref.isLoading) {
-      // Display a loading indicator if songs are still loading
       return _buildLoadingIndicator();
+    } else if (_isSearching) {
+      return _buildSearchingIndicator();
     } else if (ref.songs.isEmpty) {
-      // Display a message if there are no songs
       return const Center(
-        child: Text(
-          "No songs!!!",
-          style: TextStyle(color: Colors.white),
-        ),
+        child: Text("No songs!!!"),
+      );
+    } else if (_result.isEmpty && !_isSearching) {
+      return const Center(
+        child: Text("No results found."),
       );
     } else {
-      // Display the search result or the full song list
       return _buildSongList(ref.songs);
     }
   }
 
-  // Function to build the loading indicator widget
   Widget _buildLoadingIndicator() {
     return const Center(
       child: CircularProgressIndicator(
         strokeWidth: 2.0,
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
       ),
     );
   }
 
-  // Function to build the song list widget
+  Widget _buildSearchingIndicator() {
+    return const Center(
+      child: CircularProgressIndicator(
+        strokeWidth: 2.0,
+      ),
+    );
+  }
+
   Widget _buildSongList(List<MediaItem> songs) {
     return Stack(
       children: [
-        // Display the list of songs
         ListView.builder(
           physics: const BouncingScrollPhysics(),
           itemCount: _result.isNotEmpty ? _result.length : songs.length,
           itemBuilder: (context, index) {
-            // Determine the current song based on whether there is a search result
-            MediaItem song = _result.isNotEmpty ? _result[index] : songs[index];
-            int songIndex = songs.indexOf(song);
-
-            // Build the appropriate song item based on its position in the list
-            return StreamBuilder<MediaItem?>(
-              stream: widget.songHandler.mediaItem.stream,
-              builder: (context, snapshot) {
-                MediaItem? playingSong = snapshot.data;
-                return index ==
-                        (_result.isNotEmpty
-                            ? _result.length - 1
-                            : songs.length - 1)
-                    ? _buildLastSongItem(song, playingSong, songIndex)
-                    : _buildRegularSongItem(song, playingSong, songIndex);
-              },
-            );
+            if (_result.isNotEmpty) {
+              if (index >= _result.length) {
+                return SizedBox
+                    .shrink(); // Return an empty widget if index is out of bounds
+              }
+              MediaItem song = _result[index];
+              int songIndex = songs
+                  .indexOf(song); // Ensure song index is from original list
+              return _buildSongItem(song, songIndex);
+            } else {
+              if (index >= songs.length) {
+                return SizedBox
+                    .shrink(); // Return an empty widget if index is out of bounds
+              }
+              MediaItem song = songs[index];
+              return _buildSongItem(song, index);
+            }
           },
         ),
-        // Display the player deck at the bottom
         Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -188,67 +190,46 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // Function to build the last song item in the list
-  Widget _buildLastSongItem(MediaItem song, MediaItem? playingSong, int index) {
-    int id = int.tryParse(song.displayDescription ?? "") ?? 0;
-
-    return Column(
-      children: [
-        // Display the song item
-        SongItem(
-          art: song.artUri!,
-          searchedWord: _textEditingController.text.trim(),
-          id: id,
-          isPlaying: song == playingSong,
-          title: formattedTitle(song.title),
-          artist: song.artist,
-          onSongTap: () async {
-            // Skip to the selected song when tapped
-            await widget.songHandler.skipToQueueItem(index);
-          },
-          titleTextStyle: TextStyle(color: Colors.white),
-          artistTextStyle: TextStyle(color: Colors.white),
-        ),
-        // Display the player deck for the last song
-        PlayerDeck(
-          songHandler: widget.songHandler,
-          isLast: false,
-          onTap: (index) {
-            _scrollTo(index);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    FullScreenPlayer(songHandler: widget.songHandler),
-              ),
-            );
-          },
-        ),
-      ],
+  Widget _buildSongItem(MediaItem song, int songIndex) {
+    return StreamBuilder<MediaItem?>(
+      stream: widget.songHandler.mediaItem.stream,
+      builder: (context, snapshot) {
+        MediaItem? playingSong = snapshot.data;
+        return _buildRegularSongItem(song, playingSong, songIndex);
+      },
     );
   }
 
-  // Function to build a regular song item in the list
-  // Update _buildRegularSongItem method
   Widget _buildRegularSongItem(
       MediaItem song, MediaItem? playingSong, int songIndex) {
-    int id = int.tryParse(song.displayDescription ?? "") ?? 0;
+    if (song.artUri == null ||
+        song.displayDescription == null ||
+        song.title == null ||
+        song.artist == null) {
+      // Return a white colored container if any required field is null
+      return Container(
+        color: Colors.transparent,
+        child: Center(
+            // child: Text(
+            //   "Song information missing",
+            //   style: TextStyle(color: Colors.black),
+            // ),
+            ),
+      );
+    }
 
     return SongItem(
-      art: song.artUri, // Use a default value or handle null appropriately
+      art: song.artUri!,
       searchedWord: _textEditingController.text.trim(),
-      id: id,
+      id: int.parse(song.displayDescription!),
       isPlaying: song == playingSong,
-      title: formattedTitle(
-          song.title), // Use a default value or handle null appropriately
-      artist:
-          song.artist ?? '', // Use a default value or handle null appropriately
+      title: formattedTitle(song.title!),
+      artist: song.artist!,
       onSongTap: () async {
-        // Skip to the selected song when tapped
         await widget.songHandler.skipToQueueItem(songIndex);
       },
-      titleTextStyle: TextStyle(color: Colors.white),
-      artistTextStyle: TextStyle(color: Colors.white),
+      titleTextStyle: TextStyle(color: Colors.black),
+      artistTextStyle: TextStyle(color: Colors.black),
     );
   }
 }

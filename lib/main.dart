@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nuvibe/presentation/splash_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:get/get.dart';
 
 // Create a singleton instance of SongHandler
@@ -45,17 +44,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicColorBuilder(
-      builder: (ColorScheme? light, ColorScheme? dark) {
-        return GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          darkTheme: ThemeData(
-            colorScheme: dark,
-            useMaterial3: true,
-          ),
-          home: SplashScreen(songHandler: _songHandler),
-        );
-      },
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: SplashScreen(songHandler: _songHandler),
     );
   }
 }

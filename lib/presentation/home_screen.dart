@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:nuvibe/presentation/player_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 import 'package:nuvibe/core/notifiers/songs_provider.dart';
 import 'package:nuvibe/core/services/song_handler.dart';
 import 'package:nuvibe/presentation/global%20widgets/player_deck.dart';
-import 'package:nuvibe/presentation/global%20widgets/songs_list.dart'; // Assuming FullScreenPlayer is imported here
+import 'package:nuvibe/presentation/global%20widgets/songs_list.dart';
+import 'package:nuvibe/presentation/player_screen.dart';
 import 'package:nuvibe/presentation/search_screen.dart';
+import 'package:nuvibe/presentation/setting_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final SongHandler songHandler;
@@ -76,10 +77,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     onPressed: () => Get.to(
                       () => SearchScreen(songHandler: widget.songHandler),
-                      duration: const Duration(milliseconds: 700),
+                      duration: const Duration(milliseconds: 200),
                       transition: Transition.rightToLeft,
                     ),
                     icon: const Icon(Icons.search_rounded, color: Colors.white),
+                  ),
+                  IconButton(
+                    onPressed: () => Get.to(
+                      () => SettingScreen(),
+                      duration: const Duration(milliseconds: 200),
+                      transition: Transition.rightToLeft,
+                    ),
+                    icon: const Icon(Icons.more_vert, color: Colors.white),
                   ),
                 ],
               ),
@@ -96,21 +105,29 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildLoadingIndicator() {
     return const Center(
       child: CircularProgressIndicator(
-        strokeWidth: 2.0,
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        strokeWidth: 4.0,
+        valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
       ),
     );
   }
 
   Widget _buildSongsList(SongsProvider songsProvider) {
     return Stack(
+      fit: StackFit.expand,
       children: [
-        SongsList(
-          songHandler: widget.songHandler,
-          songs: songsProvider.songs,
-          autoScrollController: _autoScrollController,
+        Positioned.fill(
+          child: SongsList(
+            songHandler: widget.songHandler,
+            songs: songsProvider.songs,
+            autoScrollController: _autoScrollController,
+          ),
         ),
-        _buildPlayerDeck(),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: _buildPlayerDeck(),
+        ),
       ],
     );
   }

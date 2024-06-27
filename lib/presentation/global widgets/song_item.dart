@@ -144,6 +144,7 @@ class SongItem extends StatelessWidget {
     this.titleStyle,
     required TextStyle titleTextStyle,
     required TextStyle artistTextStyle,
+    // required Color backgroundColor,
   });
 
   @override

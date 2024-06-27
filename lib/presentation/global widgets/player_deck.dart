@@ -323,10 +323,7 @@ class PlayerDeck extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
                 color: isLast
                     ? Colors.transparent
-                    : Theme.of(context)
-                        .colorScheme
-                        .primaryContainer
-                        .withOpacity(0.5),
+                    : Colors.transparent
               ),
               child: QueryArtworkWidget(
                 // Artwork for the leading box
