@@ -222,6 +222,8 @@ class _FullScreenPlayerState extends State<FullScreenPlayer> {
                         size: 50,
                         songHandler: widget.songHandler,
                       ),
+                      const SizedBox(width: 20),
+                      RepeatButton(size: 50, songHandler: widget.songHandler)
                     ],
                   ),
                 ],

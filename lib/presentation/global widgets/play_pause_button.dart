@@ -96,3 +96,50 @@ class PrevButton extends StatelessWidget {
     );
   }
 }
+
+class RepeatButton extends StatelessWidget {
+  final SongHandler songHandler;
+  final double size;
+
+  const RepeatButton({
+    super.key,
+    required this.size,
+    required this.songHandler,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<RepeatMode>(
+      stream: songHandler.repeatModeStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          RepeatMode repeatMode = snapshot.data!;
+          IconData iconData;
+
+          switch (repeatMode) {
+            case RepeatMode.none:
+              iconData = Icons.repeat;
+              break;
+            case RepeatMode.one:
+              iconData = Icons.repeat_one;
+              break;
+            case RepeatMode.all:
+              iconData = Icons.repeat;
+              break;
+          }
+
+          return IconButton(
+            onPressed: songHandler.toggleRepeatMode,
+            icon: Icon(
+              iconData,
+              size: size,
+              color: Colors.white,
+            ),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
+    );
+  }
+}
