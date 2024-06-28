@@ -1,4 +1,4 @@
-package com.example.nuvibe
+package com.luminartechnolab.nuvibe
 
 import io.flutter.embedding.android.FlutterActivity
 
