@@ -1,6 +1,9 @@
+// ignore_for_file: prefer_const_constructors, use_super_parameters, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:nuvibe/presentation/favoritesscreen.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -60,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
           systemNavigationBarColor: Theme.of(context).colorScheme.background,
           systemNavigationBarIconBrightness:
               Theme.of(context).brightness == Brightness.dark
-                  ? Brightness.light
+                  ? Brightness.dark
                   : Brightness.dark,
         ),
         child: Consumer<SongsProvider>(
@@ -81,6 +84,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       transition: Transition.rightToLeft,
                     ),
                     icon: const Icon(Icons.search_rounded, color: Colors.white),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.favorite,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FavoriteSongsPage()),
+                      );
+                    },
                   ),
                   IconButton(
                     onPressed: () => Get.to(

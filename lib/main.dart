@@ -31,6 +31,10 @@ Future<void> main() async {
         ChangeNotifierProvider(
           create: (context) => SongsProvider()..loadSongs(_songHandler),
         ),
+        Provider<SongHandler>(
+          create: (_) => SongHandler(),
+          dispose: (_, songHandler) => songHandler.dispose(),
+        ),
       ],
       child: const MainApp(),
     ),

@@ -85,17 +85,17 @@
 //                         mainAxisAlignment: MainAxisAlignment.center,
 //                         children: [
 //                           PrevButton(
-//                             size: 50,
+//                             size: 30,
 //                             songHandler: songHandler,
 //                           ),
 //                           const SizedBox(width: 20),
 //                           PlayPauseButton(
-//                             size: 50,
+//                             size: 30,
 //                             songHandler: songHandler,
 //                           ),
 //                           const SizedBox(width: 20),
 //                           NextButton(
-//                             size: 50,
+//                             size: 30,
 //                             songHandler: songHandler,
 //                           ),
 //                         ],
@@ -208,22 +208,24 @@ class _FullScreenPlayerState extends State<FullScreenPlayer> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      FavoriteButton(size: 30, songHandler: widget.songHandler),
+                      const SizedBox(width: 20),
                       PrevButton(
-                        size: 50,
+                        size: 30,
                         songHandler: widget.songHandler,
                       ),
                       const SizedBox(width: 20),
                       PlayPauseButton(
-                        size: 50,
+                        size: 30,
                         songHandler: widget.songHandler,
                       ),
                       const SizedBox(width: 20),
                       NextButton(
-                        size: 50,
+                        size: 30,
                         songHandler: widget.songHandler,
                       ),
                       const SizedBox(width: 20),
-                      RepeatButton(size: 50, songHandler: widget.songHandler)
+                      RepeatButton(size: 30, songHandler: widget.songHandler),
                     ],
                   ),
                 ],
